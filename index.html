@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>صندوق يارب يسرها</title>
+<style>
+:root { --bg:#f6f5f1; --panel:#fff; --fg:#1f1e1b; --muted:#6b6962; --line:#e4e2db; --ok:#1b8a4b; --bad:#c23a2e; --accent:#3b5bdb; }
+@media (prefers-color-scheme: dark) { :root { --bg:#161614; --panel:#1f1f1c; --fg:#ecebe6; --muted:#9a978e; --line:#2f2e2a; --ok:#4cc27f; --bad:#ef6b5e; --accent:#7c93ff; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif; line-height:1.6; }
+main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; display:flex; flex-direction:column; gap:20px; }
+h1 { font-size: 1.7rem; margin:0; }
+h2 { font-size: 1.1rem; margin:0; }
+p { margin:0; }
+.num { direction:ltr; unicode-bidi:isolate; font-variant-numeric: tabular-nums; display:inline-block; }
+.muted { color:var(--muted); font-size:.85rem; }
+.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; min-width:0; }
+.grid { display:grid; gap:12px; }
+.kpis { grid-template-columns: repeat(auto-fit, minmax(min(100%,10rem),1fr)); }
+.inv { grid-template-columns: repeat(auto-fit, minmax(min(100%,16rem),1fr)); }
+.big { font-size:1.6rem; font-weight:600; }
+.pos { color:var(--ok); } .neg { color:var(--bad); }
+dl { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin:0; font-size:.95rem; }
+dt { color:var(--muted); } dd { margin:0; text-align:left; }
+.bar { height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
+.bar > i { display:block; height:100%; background:var(--accent); }
+#chart { position:relative; }
+#chart svg { width:100%; height:auto; display:block; direction:ltr; }
+.tip { position:absolute; pointer-events:none; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:.8rem; white-space:nowrap; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.15); }
+.wrap { max-height:30rem; overflow:auto; }
+table { width:100%; border-collapse:collapse; font-size:.9rem; }
+th { position:sticky; top:0; background:var(--panel); text-align:right; color:var(--muted); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+td { padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
+td.c { white-space:normal; min-width:9rem; direction:ltr; text-align:right; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>صندوق يارب يسرها</h1>
+    <p class="muted" id="take"></p>
+  </header>
+
+  <section class="grid kpis" id="kpis"></section>
+
+  <section>
+    <h2>المستثمرين</h2>
+    <p class="muted" style="margin:4px 0 12px">في كل صفقة يدخل الكل بنفس النسبة من رأس ماله، فنسبة ربح الصفقة وحدة للجميع. النسبة الكلية تختلف حسب وقت دخول رأس مال كل واحد.</p>
+    <div class="grid inv" id="inv"></div>
+  </section>
+
+  <section class="card">
+    <h2>ربح وخسارة كل صفقة</h2>
+    <p class="muted">بالدولار بعد العمولات، من الأقدم إلى الأحدث. مرّر على العمود للتفاصيل.</p>
+    <div id="chart"></div>
+  </section>
+
+  <section class="card">
+    <h2>الصفقات</h2>
+    <p class="muted">الأحدث أولاً. الربح صافي بعد العمولات، وموزع على المستثمرين حسب حصة كل واحد.</p>
+    <div class="wrap">
+      <table>
+        <thead><tr><th>#</th><th>التاريخ</th><th>الصفقة</th><th>مبلغ الدخول</th><th>النسبة</th><th>الربح</th><th>المدة</th><th>فارس</th><th>رائد</th><th>محمد</th></tr></thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="muted">المصدر: ملف "يارب يسرها Final.xlsx". يتحدث بعد كل صفقة تتسجل.</p>
+</main>
+
+<script src="data.js"></script>
+<script>
+(function () {
+  const F = window.FUND, S = F.summary;
+  const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const sign = v => v > 0 ? '+' : v < 0 ? '-' : '';
+  const money = v => (v < 0 ? '-' : '') + '$' + nf.format(Math.abs(v));
+  const sMoney = v => sign(v) + '$' + nf.format(Math.abs(v));
+  const sPct = v => sign(v) + (Math.abs(v) * 100).toFixed(1) + '%';
+  const pct2 = v => (v * 100).toFixed(2) + '%';
+  const sar = v => sign(v) + nf.format(Math.abs(v)) + ' ر.س';
+  const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  const el = (tag, c, text) => { const e = document.createElement(tag); if (c) e.className = c; if (text !== undefined) e.textContent = text; return e; };
+  const num = (text, c) => el('span', 'num ' + (c || ''), text);
+
+  // headline
+  const take = document.getElementById('take');
+  take.append('قيمة الصندوق الحين ', num(money(S.total_wallet)), ' بعد ', num(String(S.trades)), ' صفقة، وصافي الربح ', num(sMoney(S.total_pl), cls(S.total_pl)), ' (عائد ', num(sPct(S.roi)), '). آخر تحديث ', num(S.as_of), '.');
+
+  // KPIs
+  const kpis = [['قيمة الصندوق', money(S.total_wallet), ''], ['رأس المال', money(S.total_invested), ''], ['صافي الربح', sMoney(S.total_pl), cls(S.total_pl)], ['العائد منذ البداية', sPct(S.roi), cls(S.roi)]];
+  const kbox = document.getElementById('kpis');
+  kpis.forEach(([l, v, c]) => { const k = el('div', 'card'); k.append(el('p', 'muted', l), num(v, 'big ' + c)); kbox.append(k); });
+
+  // investors
+  const names = { Faris: 'فارس', Raed: 'رائد', Mohammad: 'محمد' };
+  const order = ['Faris', 'Raed', 'Mohammad'];
+  const ibox = document.getElementById('inv');
+  order.map(n => F.investors.find(i => i.investor === n)).filter(Boolean).forEach(i => {
+    const c = el('article', 'card');
+    c.append(el('h3', '', names[i.investor] || i.investor), num(money(i.wallet), 'big'), el('p', 'muted', 'قيمة محفظته الحالية'));
+    const dl = el('dl');
+    [['رأس المال', money(i.invested), ''], ['الربح', sMoney(i.pl), cls(i.pl)], ['بالريال', sar(i.pl_sar), cls(i.pl_sar)], ['نسبة الربح', sPct(i.pl_pct), cls(i.pl_pct)], ['حصته من الصندوق', pct2(i.ownership), '']]
+      .forEach(([t, v, k]) => { dl.append(el('dt', '', t)); const dd = el('dd'); dd.append(num(v, k)); dl.append(dd); });
+    const bar = el('div', 'bar'); const fill = el('i'); fill.style.width = Math.min(100, i.ownership * 100) + '%'; bar.append(fill);
+    c.append(dl, bar);
+    ibox.append(c);
+  });
+
+  // chart
+  function chart() {
+    const box = document.getElementById('chart'); box.replaceChildren();
+    const rows = F.trades.slice().sort((a, b) => a.no - b.no);
+    const W = Math.max(300, box.clientWidth), H = 260, mt = 12, mb = 28, ml = 56, mr = 8;
+    const lo = Math.min(0, ...rows.map(r => r.pl)), hi = Math.max(0, ...rows.map(r => r.pl));
+    const step = Math.pow(10, Math.floor(Math.log10((hi - lo) / 4))), mult = [1, 2, 5, 10].find(m => (hi - lo) / (step * m) <= 6) * step;
+    const y0 = Math.floor(lo / mult) * mult, y1 = Math.ceil(hi / mult) * mult;
+    const y = v => mt + (H - mt - mb) * (1 - (v - y0) / (y1 - y0));
+    const ns = 'http://www.w3.org/2000/svg';
+    const mk = (t, a) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+    const svg = mk('svg', { viewBox: `0 0 ${W} ${H}` });
+    for (let t = y0; t <= y1 + 1e-9; t += mult) {
+      svg.append(mk('line', { x1: ml, x2: W - mr, y1: y(t), y2: y(t), stroke: 'var(--line)' }));
+      const tx = mk('text', { x: ml - 6, y: y(t), dy: '0.32em', 'text-anchor': 'end', fill: 'var(--muted)', 'font-size': 11 });
+      tx.textContent = (t < 0 ? '-' : '') + '$' + Math.abs(t).toLocaleString('en-US'); svg.append(tx);
+    }
+    const bw = (W - ml - mr) / rows.length, w = Math.min(32, bw * .75);
+    const tip = el('div', 'tip'); tip.hidden = true;
+    rows.forEach((r, k) => {
+      const x = ml + k * bw + (bw - w) / 2;
+      const rect = mk('rect', { x, width: w, y: y(Math.max(0, r.pl)), height: Math.max(1, Math.abs(y(r.pl) - y(0))), rx: 3, fill: r.pl >= 0 ? 'var(--ok)' : 'var(--bad)' });
+      rect.addEventListener('mouseenter', () => {
+        rect.style.opacity = .75; tip.replaceChildren(el('div', 'muted', '#' + r.no + ' · ' + r.date), el('div', '', r.contract), num(sMoney(r.pl) + '  (' + sPct(r.pl_pct) + ')'));
+        tip.hidden = false;
+        const bx = box.getBoundingClientRect(), rx = rect.getBoundingClientRect();
+        tip.style.left = Math.max(0, Math.min(rx.left - bx.left + rx.width / 2 - tip.offsetWidth / 2, bx.width - tip.offsetWidth)) + 'px';
+        tip.style.top = Math.max(0, rx.top - bx.top - tip.offsetHeight - 6) + 'px';
+      });
+      rect.addEventListener('mouseleave', () => { rect.style.opacity = ''; tip.hidden = true; });
+      svg.append(rect);
+      if (bw >= 16 || k % 2 === 0) { const lb = mk('text', { x: x + w / 2, y: H - 8, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': 11 }); lb.textContent = '#' + r.no; svg.append(lb); }
+    });
+    svg.append(mk('line', { x1: ml, x2: W - mr, y1: y(0), y2: y(0), stroke: 'var(--muted)' }));
+    box.append(svg, tip);
+  }
+  chart(); let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(chart, 120); });
+
+  // table
+  const tb = document.getElementById('rows');
+  F.trades.slice().sort((a, b) => b.no - a.no).forEach(r => {
+    const tr = el('tr');
+    [[String(r.no), 'num'], [r.date, 'num'], [r.contract, 'c'], [money(r.entry), 'num'], [sPct(r.pl_pct), 'num ' + cls(r.pl_pct)], [sMoney(r.pl), 'num ' + cls(r.pl)], [r.duration || '', 'num'], [sMoney(r.faris), 'num ' + cls(r.faris)], [sMoney(r.raed), 'num ' + cls(r.raed)], [sMoney(r.mohammad), 'num ' + cls(r.mohammad)]]
+      .forEach(([t, c]) => tr.append(el('td', c, t)));
+    tb.append(tr);
+  });
+})();
+</script>
+</body>
+</html>
