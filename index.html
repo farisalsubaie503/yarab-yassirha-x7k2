@@ -2,73 +2,137 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
+<meta name="color-scheme" content="light dark">
 <title>صندوق يارب يسرها</title>
 <style>
-:root { --bg:#f6f5f1; --panel:#fff; --fg:#1f1e1b; --muted:#6b6962; --line:#e4e2db; --ok:#1b8a4b; --bad:#c23a2e; --accent:#3b5bdb; }
-@media (prefers-color-scheme: dark) { :root { --bg:#161614; --panel:#1f1f1c; --fg:#ecebe6; --muted:#9a978e; --line:#2f2e2a; --ok:#4cc27f; --bad:#ef6b5e; --accent:#7c93ff; } }
-* { box-sizing: border-box; }
-body { margin:0; background:var(--bg); color:var(--fg); font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", system-ui, sans-serif; line-height:1.6; }
-main { max-width: 1000px; margin: 0 auto; padding: 24px 16px 48px; display:flex; flex-direction:column; gap:20px; }
-h1 { font-size: 1.7rem; margin:0; }
-h2 { font-size: 1.1rem; margin:0; }
-p { margin:0; }
-.num { direction:ltr; unicode-bidi:isolate; font-variant-numeric: tabular-nums; display:inline-block; }
-.muted { color:var(--muted); font-size:.85rem; }
-.card { background:var(--panel); border:1px solid var(--line); border-radius:12px; padding:16px; display:flex; flex-direction:column; gap:8px; min-width:0; }
-.grid { display:grid; gap:12px; }
-.kpis { grid-template-columns: repeat(auto-fit, minmax(min(100%,10rem),1fr)); }
-.inv { grid-template-columns: repeat(auto-fit, minmax(min(100%,16rem),1fr)); }
-.big { font-size:1.6rem; font-weight:600; }
+:root {
+  --bg:#f5f5f7; --card:#ffffff; --card2:#f5f5f7; --fg:#1d1d1f; --muted:#6e6e73; --line:rgba(0,0,0,.08);
+  --ok:#248a3d; --ok-bg:rgba(52,199,89,.14); --bad:#d70015; --bad-bg:rgba(255,59,48,.12); --accent:#0071e3;
+  --shadow:0 1px 2px rgba(0,0,0,.04), 0 8px 30px rgba(0,0,0,.06);
+  --glass:rgba(245,245,247,.72);
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg:#000; --card:#1c1c1e; --card2:#2c2c2e; --fg:#f5f5f7; --muted:#98989d; --line:rgba(255,255,255,.1);
+    --ok:#30d158; --ok-bg:rgba(48,209,88,.16); --bad:#ff453a; --bad-bg:rgba(255,69,58,.16); --accent:#0a84ff;
+    --shadow:none; --glass:rgba(0,0,0,.6); }
+}
+* { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html { -webkit-text-size-adjust:100%; }
+body { margin:0; background:var(--bg); color:var(--fg); line-height:1.5; -webkit-font-smoothing:antialiased;
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif; }
+p,h1,h2,h3,dl,dd { margin:0; }
+.num { direction:ltr; unicode-bidi:isolate; font-variant-numeric:tabular-nums; }
 .pos { color:var(--ok); } .neg { color:var(--bad); }
-dl { display:grid; grid-template-columns:auto 1fr; gap:4px 12px; margin:0; font-size:.95rem; }
-dt { color:var(--muted); } dd { margin:0; text-align:left; }
-.bar { height:6px; border-radius:3px; background:var(--line); overflow:hidden; }
-.bar > i { display:block; height:100%; background:var(--accent); }
-#chart { position:relative; }
-#chart svg { width:100%; height:auto; display:block; direction:ltr; }
-.tip { position:absolute; pointer-events:none; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:6px 10px; font-size:.8rem; white-space:nowrap; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.15); }
-.wrap { max-height:30rem; overflow:auto; }
-table { width:100%; border-collapse:collapse; font-size:.9rem; }
-th { position:sticky; top:0; background:var(--panel); text-align:right; color:var(--muted); font-weight:500; padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
-td { padding:6px 10px; border-bottom:1px solid var(--line); white-space:nowrap; }
-td.c { white-space:normal; min-width:9rem; direction:ltr; text-align:right; }
+main { max-width:980px; margin:0 auto; padding:0 20px 64px; }
+
+/* nav */
+.nav { position:sticky; top:0; z-index:10; backdrop-filter:saturate(180%) blur(20px); -webkit-backdrop-filter:saturate(180%) blur(20px);
+  background:var(--glass); border-bottom:1px solid var(--line); }
+.nav div { max-width:980px; margin:0 auto; padding:12px 20px; display:flex; justify-content:space-between; align-items:center; font-size:.9rem; }
+.nav b { font-weight:600; } .nav span { color:var(--muted); }
+
+/* hero */
+.hero { text-align:center; padding:64px 0 40px; }
+.eyebrow { color:var(--muted); font-size:1rem; font-weight:500; }
+.hero h1 { font-size:clamp(2.6rem, 9vw, 4.6rem); font-weight:700; letter-spacing:-.02em; line-height:1.05; margin:10px 0 6px; }
+.hero h1 small { font-size:.45em; font-weight:600; color:var(--muted); margin-inline-end:.15em; }
+.pill { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:999px; font-weight:600; font-size:.95rem; }
+.pill.pos { background:var(--ok-bg); } .pill.neg { background:var(--bad-bg); }
+.sub { color:var(--muted); margin-top:14px; font-size:.95rem; }
+
+/* cards */
+.card { background:var(--card); border-radius:24px; padding:24px; box-shadow:var(--shadow); min-width:0; }
+.grid { display:grid; gap:14px; }
+.kpis { grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); }
+.kpi .l { color:var(--muted); font-size:.9rem; }
+.kpi .v { font-size:1.9rem; font-weight:700; letter-spacing:-.01em; margin-top:4px; }
+h2.sec { font-size:1.75rem; font-weight:700; letter-spacing:-.01em; margin:56px 0 6px; }
+.secsub { color:var(--muted); margin-bottom:18px; font-size:.95rem; max-width:44rem; }
+
+/* investors */
+.inv { grid-template-columns:repeat(auto-fit,minmax(min(100%,17rem),1fr)); }
+.inv .name { font-size:1.05rem; font-weight:600; }
+.inv .wallet { font-size:2rem; font-weight:700; letter-spacing:-.01em; margin:6px 0 2px; }
+.inv .cap { color:var(--muted); font-size:.85rem; }
+.rows { margin-top:16px; display:grid; gap:10px; }
+.rows div { display:flex; justify-content:space-between; font-size:.95rem; border-top:1px solid var(--line); padding-top:10px; }
+.rows dt { color:var(--muted); } .rows dd { font-weight:500; }
+.bar { height:6px; border-radius:3px; background:var(--card2); overflow:hidden; margin-top:14px; }
+.bar i { display:block; height:100%; border-radius:3px; background:var(--accent); }
+
+/* chart */
+#chart { position:relative; margin-top:8px; }
+#chart svg { width:100%; height:auto; display:block; direction:ltr; overflow:visible; }
+.tip { position:absolute; pointer-events:none; background:var(--card); box-shadow:0 8px 30px rgba(0,0,0,.2); border-radius:14px; padding:10px 14px; font-size:.85rem; white-space:nowrap; z-index:3; border:1px solid var(--line); }
+.tip b { display:block; font-size:.95rem; }
+
+/* trades */
+.chips { display:inline-flex; background:var(--card2); border-radius:12px; padding:3px; gap:2px; margin-bottom:16px; }
+.chips button { border:0; background:transparent; color:var(--fg); font:inherit; font-size:.9rem; padding:7px 16px; border-radius:10px; cursor:pointer; }
+.chips button[aria-pressed=true] { background:var(--card); box-shadow:0 1px 4px rgba(0,0,0,.15); font-weight:600; }
+.trades { display:grid; gap:10px; }
+details.t { background:var(--card); border-radius:20px; box-shadow:var(--shadow); overflow:hidden; }
+details.t > summary { list-style:none; cursor:pointer; padding:16px 20px; display:grid; grid-template-columns:auto 1fr auto; gap:14px; align-items:center; }
+details.t > summary::-webkit-details-marker { display:none; }
+.ico { width:44px; height:44px; border-radius:12px; display:grid; place-items:center; font-weight:700; font-size:.75rem; letter-spacing:.02em; }
+.ico.pos { background:var(--ok-bg); } .ico.neg { background:var(--bad-bg); }
+.tt .tk { font-weight:600; font-size:1.05rem; }
+.tt .tm { color:var(--muted); font-size:.85rem; display:flex; flex-wrap:wrap; gap:4px 10px; margin-top:2px; }
+.tag { padding:0 8px; border-radius:6px; background:var(--card2); font-size:.75rem; font-weight:600; line-height:1.6; }
+.res { text-align:left; }
+.res .amt { font-weight:700; font-size:1.1rem; }
+.res .pc { font-size:.85rem; font-weight:500; }
+.chev { display:inline-block; margin-inline-start:10px; transition:transform .2s; color:var(--muted); font-size:.8rem; }
+details[open] .chev { transform:rotate(90deg); }
+.detail { padding:4px 20px 20px; display:grid; gap:18px; }
+.metrics { display:grid; grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr)); gap:10px; }
+.m { background:var(--card2); border-radius:14px; padding:12px 14px; }
+.m .l { color:var(--muted); font-size:.78rem; } .m .v { font-weight:600; margin-top:2px; font-size:1rem; }
+.split { width:100%; border-collapse:collapse; font-size:.92rem; }
+.split th { text-align:right; color:var(--muted); font-weight:500; font-size:.78rem; padding:0 8px 8px; white-space:nowrap; }
+.split td { padding:10px 8px; border-top:1px solid var(--line); white-space:nowrap; }
+.split td:first-child { font-weight:600; }
+.scroll { overflow-x:auto; }
+.empty { color:var(--muted); text-align:center; padding:30px; }
+footer { color:var(--muted); font-size:.8rem; text-align:center; margin-top:56px; }
+@media (max-width:520px) {
+  main { padding:0 14px 48px; } .card { padding:18px; border-radius:20px; }
+  details.t > summary { padding:14px; gap:10px; } .ico { width:38px; height:38px; }
+}
 </style>
 </head>
 <body>
+<div class="nav"><div><b>يارب يسرها</b><span class="num" id="navdate"></span></div></div>
 <main>
-  <header>
-    <h1>صندوق يارب يسرها</h1>
-    <p class="muted" id="take"></p>
-  </header>
+  <section class="hero">
+    <p class="eyebrow">قيمة الصندوق</p>
+    <h1 class="num" id="hero"></h1>
+    <span class="pill" id="heropill"></span>
+    <p class="sub" id="herosub"></p>
+  </section>
 
   <section class="grid kpis" id="kpis"></section>
 
-  <section>
-    <h2>المستثمرين</h2>
-    <p class="muted" style="margin:4px 0 12px">في كل صفقة يدخل الكل بنفس النسبة من رأس ماله، فنسبة ربح الصفقة وحدة للجميع. النسبة الكلية تختلف حسب وقت دخول رأس مال كل واحد.</p>
-    <div class="grid inv" id="inv"></div>
-  </section>
+  <h2 class="sec">المستثمرين</h2>
+  <p class="secsub">في كل صفقة يدخل الكل بنفس النسبة من رأس ماله، فنسبة ربح الصفقة وحدة للجميع. النسبة الكلية تختلف حسب وقت دخول رأس مال كل واحد.</p>
+  <div class="grid inv" id="inv"></div>
 
-  <section class="card">
-    <h2>ربح وخسارة كل صفقة</h2>
-    <p class="muted">بالدولار بعد العمولات، من الأقدم إلى الأحدث. مرّر على العمود للتفاصيل.</p>
-    <div id="chart"></div>
-  </section>
+  <h2 class="sec">أداء الصفقات</h2>
+  <p class="secsub">ربح وخسارة كل صفقة بالدولار بعد العمولات، من الأقدم إلى الأحدث.</p>
+  <div class="card"><div id="chart"></div></div>
 
-  <section class="card">
-    <h2>الصفقات</h2>
-    <p class="muted">الأحدث أولاً. الربح صافي بعد العمولات، وموزع على المستثمرين حسب حصة كل واحد.</p>
-    <div class="wrap">
-      <table>
-        <thead><tr><th>#</th><th>التاريخ</th><th>الصفقة</th><th>مبلغ الدخول</th><th>النسبة</th><th>الربح</th><th>المدة</th><th>فارس</th><th>رائد</th><th>محمد</th></tr></thead>
-        <tbody id="rows"></tbody>
-      </table>
-    </div>
-  </section>
+  <h2 class="sec">الصفقات</h2>
+  <p class="secsub">الأحدث أولاً. اضغط على أي صفقة تشوف الدخول والخروج والمدة وحصة كل مستثمر.</p>
+  <div class="chips" id="chips">
+    <button data-f="all" aria-pressed="true">الكل</button>
+    <button data-f="win" aria-pressed="false">الرابحة</button>
+    <button data-f="loss" aria-pressed="false">الخاسرة</button>
+  </div>
+  <div class="trades" id="trades"></div>
 
-  <p class="muted">المصدر: ملف "يارب يسرها Final.xlsx". يتحدث بعد كل صفقة تتسجل.</p>
+  <footer>المصدر: ملف "يارب يسرها Final.xlsx". يتحدث بعد كل صفقة تتسجل.</footer>
 </main>
 
 <script src="data.js"></script>
@@ -79,83 +143,148 @@ td.c { white-space:normal; min-width:9rem; direction:ltr; text-align:right; }
   const sign = v => v > 0 ? '+' : v < 0 ? '-' : '';
   const money = v => (v < 0 ? '-' : '') + '$' + nf.format(Math.abs(v));
   const sMoney = v => sign(v) + '$' + nf.format(Math.abs(v));
-  const sPct = v => sign(v) + (Math.abs(v) * 100).toFixed(1) + '%';
+  const sPct = v => sign(v) + (Math.abs(v) * 100).toFixed(2) + '%';
   const pct2 = v => (v * 100).toFixed(2) + '%';
   const sar = v => sign(v) + nf.format(Math.abs(v)) + ' ر.س';
   const cls = v => v > 0 ? 'pos' : v < 0 ? 'neg' : '';
+  const $ = id => document.getElementById(id);
   const el = (tag, c, text) => { const e = document.createElement(tag); if (c) e.className = c; if (text !== undefined) e.textContent = text; return e; };
   const num = (text, c) => el('span', 'num ' + (c || ''), text);
+  const fmtDate = s => { const d = new Date(s + 'T00:00:00'); return isNaN(d) ? s : d.toLocaleDateString('ar-u-nu-latn', { day: 'numeric', month: 'long', year: 'numeric' }); };
 
-  // headline
-  const take = document.getElementById('take');
-  take.append('قيمة الصندوق الحين ', num(money(S.total_wallet)), ' بعد ', num(String(S.trades)), ' صفقة، وصافي الربح ', num(sMoney(S.total_pl), cls(S.total_pl)), ' (عائد ', num(sPct(S.roi)), '). آخر تحديث ', num(S.as_of), '.');
+  // مدة الصفقة: تقبل "14.00 min" أو "1.5 hr" أو "2 day" أو entry_time/exit_time
+  function durSeconds(t) {
+    if (t.entry_time && t.exit_time) { const a = new Date(t.entry_time), b = new Date(t.exit_time); if (!isNaN(a) && !isNaN(b)) return (b - a) / 1000; }
+    const m = String(t.duration || '').trim().match(/^([\d.]+)\s*(sec|s|min|m|hr|h|hour|day|d)/i);
+    if (!m) return null;
+    const v = parseFloat(m[1]), u = m[2].toLowerCase();
+    return u.startsWith('s') ? v : u.startsWith('m') ? v * 60 : u.startsWith('h') ? v * 3600 : v * 86400;
+  }
+  function fmtDur(sec) {
+    if (sec == null) return '—';
+    const plural = (n, one, two, few, many) => n === 1 ? one : n === 2 ? two : (n >= 3 && n <= 10) ? n + ' ' + few : n + ' ' + many;
+    if (sec < 60) return plural(Math.round(sec), 'ثانية', 'ثانيتين', 'ثواني', 'ثانية');
+    if (sec < 3600) { const m = Math.round(sec / 60); return plural(m, 'دقيقة', 'دقيقتين', 'دقايق', 'دقيقة'); }
+    if (sec < 86400) { const h = Math.floor(sec / 3600), m = Math.round((sec % 3600) / 60); const hs = plural(h, 'ساعة', 'ساعتين', 'ساعات', 'ساعة'); return m ? hs + ' و' + plural(m, 'دقيقة', 'دقيقتين', 'دقايق', 'دقيقة') : hs; }
+    const d = Math.floor(sec / 86400), h = Math.round((sec % 86400) / 3600); const ds = plural(d, 'يوم', 'يومين', 'أيام', 'يوم'); return h ? ds + ' و' + plural(h, 'ساعة', 'ساعتين', 'ساعات', 'ساعة') : ds;
+  }
+
+  // header + hero
+  $('navdate').textContent = S.as_of;
+  $('hero').append(el('small', '', '$'), nf.format(S.total_wallet));
+  const hp = $('heropill'); hp.className = 'pill ' + cls(S.total_pl);
+  hp.append(num(sMoney(S.total_pl)), ' · ', num(sPct(S.roi)));
+  $('herosub').append('بعد ', num(String(S.trades)), ' صفقة · آخر تحديث ', num(S.as_of));
 
   // KPIs
-  const kpis = [['قيمة الصندوق', money(S.total_wallet), ''], ['رأس المال', money(S.total_invested), ''], ['صافي الربح', sMoney(S.total_pl), cls(S.total_pl)], ['العائد منذ البداية', sPct(S.roi), cls(S.roi)]];
-  const kbox = document.getElementById('kpis');
-  kpis.forEach(([l, v, c]) => { const k = el('div', 'card'); k.append(el('p', 'muted', l), num(v, 'big ' + c)); kbox.append(k); });
+  const kb = $('kpis');
+  [['رأس المال', money(S.total_invested), ''], ['صافي الربح', sMoney(S.total_pl), cls(S.total_pl)], ['العائد منذ البداية', sPct(S.roi), cls(S.roi)],
+   ['الصفقات الرابحة', F.trades.filter(t => t.pl > 0).length + ' من ' + F.trades.length, '']]
+    .forEach(([l, v, c]) => { const k = el('div', 'card kpi'); k.append(el('p', 'l', l), num(v, 'v ' + c)); k.querySelector('.v').style.display = 'block'; kb.append(k); });
 
   // investors
-  const names = { Faris: 'فارس', Raed: 'رائد', Mohammad: 'محمد' };
-  const order = ['Faris', 'Raed', 'Mohammad'];
-  const ibox = document.getElementById('inv');
+  const names = { Faris: 'فارس', Raed: 'رائد', Mohammad: 'محمد' }, order = ['Faris', 'Raed', 'Mohammad'];
   order.map(n => F.investors.find(i => i.investor === n)).filter(Boolean).forEach(i => {
-    const c = el('article', 'card');
-    c.append(el('h3', '', names[i.investor] || i.investor), num(money(i.wallet), 'big'), el('p', 'muted', 'قيمة محفظته الحالية'));
-    const dl = el('dl');
+    const c = el('article', 'card inv-card');
+    c.append(el('p', 'name', names[i.investor] || i.investor));
+    const w = num(money(i.wallet), 'wallet'); w.style.display = 'block'; c.append(w, el('p', 'cap', 'قيمة المحفظة الحالية'));
+    const dl = el('dl', 'rows');
     [['رأس المال', money(i.invested), ''], ['الربح', sMoney(i.pl), cls(i.pl)], ['بالريال', sar(i.pl_sar), cls(i.pl_sar)], ['نسبة الربح', sPct(i.pl_pct), cls(i.pl_pct)], ['حصته من الصندوق', pct2(i.ownership), '']]
-      .forEach(([t, v, k]) => { dl.append(el('dt', '', t)); const dd = el('dd'); dd.append(num(v, k)); dl.append(dd); });
-    const bar = el('div', 'bar'); const fill = el('i'); fill.style.width = Math.min(100, i.ownership * 100) + '%'; bar.append(fill);
-    c.append(dl, bar);
-    ibox.append(c);
+      .forEach(([t, v, k]) => { const r = el('div'); r.append(el('dt', '', t)); const dd = el('dd'); dd.append(num(v, k)); r.append(dd); dl.append(r); });
+    const bar = el('div', 'bar'), fill = el('i'); fill.style.width = Math.min(100, i.ownership * 100) + '%'; bar.append(fill);
+    c.append(dl, bar); $('inv').append(c);
   });
 
   // chart
   function chart() {
-    const box = document.getElementById('chart'); box.replaceChildren();
+    const box = $('chart'); box.replaceChildren();
     const rows = F.trades.slice().sort((a, b) => a.no - b.no);
-    const W = Math.max(300, box.clientWidth), H = 260, mt = 12, mb = 28, ml = 56, mr = 8;
+    const W = Math.max(300, box.clientWidth), H = 280, mt = 14, mb = 30, ml = 56, mr = 4;
     const lo = Math.min(0, ...rows.map(r => r.pl)), hi = Math.max(0, ...rows.map(r => r.pl));
-    const step = Math.pow(10, Math.floor(Math.log10((hi - lo) / 4))), mult = [1, 2, 5, 10].find(m => (hi - lo) / (step * m) <= 6) * step;
-    const y0 = Math.floor(lo / mult) * mult, y1 = Math.ceil(hi / mult) * mult;
-    const y = v => mt + (H - mt - mb) * (1 - (v - y0) / (y1 - y0));
-    const ns = 'http://www.w3.org/2000/svg';
-    const mk = (t, a) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
+    const raw = (hi - lo) / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), mult = [1, 2, 5, 10].map(m => m * p).find(m => (hi - lo) / m <= 6);
+    const y0 = Math.floor(lo / mult) * mult, y1 = Math.ceil(hi / mult) * mult, y = v => mt + (H - mt - mb) * (1 - (v - y0) / (y1 - y0));
+    const ns = 'http://www.w3.org/2000/svg', mk = (t, a) => { const e = document.createElementNS(ns, t); for (const k in a) e.setAttribute(k, a[k]); return e; };
     const svg = mk('svg', { viewBox: `0 0 ${W} ${H}` });
     for (let t = y0; t <= y1 + 1e-9; t += mult) {
       svg.append(mk('line', { x1: ml, x2: W - mr, y1: y(t), y2: y(t), stroke: 'var(--line)' }));
-      const tx = mk('text', { x: ml - 6, y: y(t), dy: '0.32em', 'text-anchor': 'end', fill: 'var(--muted)', 'font-size': 11 });
+      const tx = mk('text', { x: ml - 8, y: y(t), dy: '0.32em', 'text-anchor': 'end', fill: 'var(--muted)', 'font-size': 11 });
       tx.textContent = (t < 0 ? '-' : '') + '$' + Math.abs(t).toLocaleString('en-US'); svg.append(tx);
     }
-    const bw = (W - ml - mr) / rows.length, w = Math.min(32, bw * .75);
-    const tip = el('div', 'tip'); tip.hidden = true;
+    const bw = (W - ml - mr) / rows.length, w = Math.min(26, bw * .66), tip = el('div', 'tip'); tip.hidden = true;
     rows.forEach((r, k) => {
-      const x = ml + k * bw + (bw - w) / 2;
-      const rect = mk('rect', { x, width: w, y: y(Math.max(0, r.pl)), height: Math.max(1, Math.abs(y(r.pl) - y(0))), rx: 3, fill: r.pl >= 0 ? 'var(--ok)' : 'var(--bad)' });
+      const x = ml + k * bw + (bw - w) / 2, top = y(Math.max(0, r.pl)), h = Math.max(2, Math.abs(y(r.pl) - y(0)));
+      const rect = mk('rect', { x, width: w, y: top, height: h, rx: Math.min(7, w / 2), fill: r.pl >= 0 ? 'var(--ok)' : 'var(--bad)', opacity: .9 });
+      rect.style.transition = 'opacity .15s';
       rect.addEventListener('mouseenter', () => {
-        rect.style.opacity = .75; tip.replaceChildren(el('div', 'muted', '#' + r.no + ' · ' + r.date), el('div', '', r.contract), num(sMoney(r.pl) + '  (' + sPct(r.pl_pct) + ')'));
-        tip.hidden = false;
+        rect.style.opacity = 1;
+        const a = el('b', '', r.contract), b = el('span', 'muted', '#' + r.no + ' · ' + r.date); b.style.color = 'var(--muted)';
+        tip.replaceChildren(a, b, document.createElement('br'), num(sMoney(r.pl) + '  (' + sPct(r.pl_pct) + ')', cls(r.pl))); tip.hidden = false;
         const bx = box.getBoundingClientRect(), rx = rect.getBoundingClientRect();
         tip.style.left = Math.max(0, Math.min(rx.left - bx.left + rx.width / 2 - tip.offsetWidth / 2, bx.width - tip.offsetWidth)) + 'px';
-        tip.style.top = Math.max(0, rx.top - bx.top - tip.offsetHeight - 6) + 'px';
+        tip.style.top = Math.max(0, rx.top - bx.top - tip.offsetHeight - 8) + 'px';
       });
-      rect.addEventListener('mouseleave', () => { rect.style.opacity = ''; tip.hidden = true; });
+      rect.addEventListener('mouseleave', () => { rect.style.opacity = .9; tip.hidden = true; });
       svg.append(rect);
-      if (bw >= 16 || k % 2 === 0) { const lb = mk('text', { x: x + w / 2, y: H - 8, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': 11 }); lb.textContent = '#' + r.no; svg.append(lb); }
+      if (bw >= 18 || k % 2 === 0) { const lb = mk('text', { x: x + w / 2, y: H - 8, 'text-anchor': 'middle', fill: 'var(--muted)', 'font-size': 11 }); lb.textContent = r.no; svg.append(lb); }
     });
-    svg.append(mk('line', { x1: ml, x2: W - mr, y1: y(0), y2: y(0), stroke: 'var(--muted)' }));
+    svg.append(mk('line', { x1: ml, x2: W - mr, y1: y(0), y2: y(0), stroke: 'var(--muted)', 'stroke-opacity': .5 }));
     box.append(svg, tip);
   }
   chart(); let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(chart, 120); });
 
-  // table
-  const tb = document.getElementById('rows');
-  F.trades.slice().sort((a, b) => b.no - a.no).forEach(r => {
-    const tr = el('tr');
-    [[String(r.no), 'num'], [r.date, 'num'], [r.contract, 'c'], [money(r.entry), 'num'], [sPct(r.pl_pct), 'num ' + cls(r.pl_pct)], [sMoney(r.pl), 'num ' + cls(r.pl)], [r.duration || '', 'num'], [sMoney(r.faris), 'num ' + cls(r.faris)], [sMoney(r.raed), 'num ' + cls(r.raed)], [sMoney(r.mohammad), 'num ' + cls(r.mohammad)]]
-      .forEach(([t, c]) => tr.append(el('td', c, t)));
-    tb.append(tr);
-  });
+  // trades
+  const invKeys = [['faris', 'فارس'], ['raed', 'رائد'], ['mohammad', 'محمد']];
+  function tradeCard(t) {
+    const d = el('details', 't');
+    const sm = el('summary');
+    const parts = String(t.contract).split(' '), tk = parts[0], rest = parts.slice(1).join(' ');
+    const type = /Call$/i.test(rest) ? 'Call' : /Put$/i.test(rest) ? 'Put' : '';
+    const ico = el('div', 'ico ' + cls(t.pl), tk.slice(0, 4)); ico.style.direction = 'ltr';
+    const tt = el('div', 'tt'); tt.append(el('p', 'tk', tk));
+    const tm = el('p', 'tm'); tm.append(num('#' + t.no), el('span', '', fmtDate(t.date)));
+    if (rest) { const s = num(rest.replace(/\s*(Call|Put)$/i, '')); tm.append(s); }
+    if (type) tm.append(el('span', 'tag', type));
+    tt.append(tm);
+    const res = el('div', 'res'); res.append(num(sMoney(t.pl), 'amt ' + cls(t.pl)), document.createElement('br'), num(sPct(t.pl_pct), 'pc ' + cls(t.pl)), el('span', 'chev', '‹'));
+    res.firstChild.style.display = 'inline-block';
+    sm.append(ico, tt, res); d.append(sm);
+
+    const exit = t.exit != null ? +t.exit : +t.entry + +t.pl, secs = durSeconds(t);
+    const det = el('div', 'detail'), ms = el('div', 'metrics');
+    const metric = (l, v, c) => { const m = el('div', 'm'); m.append(el('p', 'l', l)); const vv = el('p', 'v'); vv.append(v instanceof Node ? v : num(v, c)); m.append(vv); return m; };
+    ms.append(metric('مبلغ الدخول', money(t.entry)), metric('مبلغ الخروج', money(exit)), metric('صافي الربح', sMoney(t.pl), cls(t.pl)));
+    if (t.qty != null) ms.append(metric('الكمية', String(t.qty)));
+    if (t.entry_price != null) ms.append(metric('سعر الدخول', money(+t.entry_price)));
+    if (t.exit_price != null) ms.append(metric('سعر الخروج', money(+t.exit_price)));
+    ms.append(metric('المدة', document.createTextNode(fmtDur(secs))));
+    det.append(ms);
+
+    // حصة كل مستثمر: الدخول = مبلغ الدخول × (ربحه ÷ ربح الصفقة)
+    const tbl = el('table', 'split'), hd = el('tr');
+    ['المستثمر', 'الدخول', 'الخروج', 'الربح'].forEach(h => hd.append(el('th', '', h)));
+    tbl.append(el('thead')).append(hd);
+    const tb = el('tbody');
+    invKeys.forEach(([k, n]) => {
+      const p = +t[k]; const share = t.pl ? p / t.pl : 0, en = t.entry * share, ex = en + p;
+      const tr = el('tr'); tr.append(el('td', '', n));
+      [[money(en), ''], [money(ex), ''], [sMoney(p), cls(p)]].forEach(([v, c]) => { const td = el('td'); td.append(num(v, c)); tr.append(td); });
+      tb.append(tr);
+    });
+    tbl.append(tb); const sc = el('div', 'scroll'); sc.append(tbl); det.append(sc);
+    d.append(det); return d;
+  }
+  const list = $('trades'), all = F.trades.slice().sort((a, b) => b.no - a.no);
+  function render(f) {
+    list.replaceChildren();
+    const rows = all.filter(t => f === 'all' || (f === 'win' ? t.pl > 0 : t.pl < 0));
+    if (!rows.length) list.append(el('p', 'empty', 'ما فيه صفقات'));
+    rows.forEach(t => list.append(tradeCard(t)));
+  }
+  render('all');
+  document.querySelectorAll('#chips button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#chips button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    render(b.dataset.f);
+  }));
 })();
 </script>
 </body>
