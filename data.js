@@ -1,44 +1,15 @@
+// ===== بيانات صندوق يارب يسرها =====
+// 1) base = مبلغ دخول كل واحد من بداية المحفظة. ثابت، لا يتغير أبداً.
+// 2) current = القيمة الحالية لكل واحد. هذا اللي يتحدث (أسبوعياً أو بعد الصفقات).
+// 3) withdrawals = السحوبات من رأس المال. كل سحب يتسجل هنا: { investor: "raed", date: "2026-11-01", amount: 200 }
+//    الربح = القيمة الحالية + مجموع السحوبات - مبلغ الدخول الأساسي.
 window.FUND = {
- summary: [
-{
-"total_wallet": 24204.7,
-"total_invested": 23515.31,
-"roi": 0.0293,
-"total_pl": 689.39,
-"trades": 18,
-"as_of": "2026-10-22"
-}
-][0],
- investors: [
-{
-"investor": "Faris",
-"invested": 21972.79,
-"ownership": 0.9344,
-"wallet": 22355.12,
-"pl": 382.33,
-"pl_pct": 0.0174,
-"pl_sar": 1433.72
-},
-{
-"investor": "Mohammad",
-"invested": 397.67,
-"ownership": 0.0169,
-"wallet": 475.14,
-"pl": 77.47,
-"pl_pct": 0.1948,
-"pl_sar": 290.5
-},
-{
-"investor": "Raed",
-"invested": 1144.85,
-"ownership": 0.0487,
-"wallet": 1378.26,
-"pl": 233.41,
-"pl_pct": 0.2039,
-"pl_sar": 875.29
-}
-],
- trades: [
+  as_of: "2026-10-22",
+  usd_sar: 3.75,
+  base:    { faris: 21972.79, raed: 1474.00, mohammad: 419.00 },
+  current: { faris: 22355.12, raed: 1378.26, mohammad: 475.14 },
+  withdrawals: [],
+  trades: [
 {
 "no": 1,
 "date": "2026-08-31",

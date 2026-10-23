@@ -138,7 +138,17 @@ footer { color:var(--muted); font-size:.8rem; text-align:center; margin-top:56px
 <script src="data.js"></script>
 <script>
 (function () {
-  const F = window.FUND, S = F.summary;
+  const F = window.FUND;
+  // الحسابات من base + current + withdrawals
+  const keys = ['faris', 'raed', 'mohammad'], capName = { faris: 'Faris', raed: 'Raed', mohammad: 'Mohammad' };
+  const totalWallet = keys.reduce((s, k) => s + F.current[k], 0);
+  F.investors = keys.map(k => {
+    const wd = (F.withdrawals || []).filter(w => w.investor === k).reduce((s, w) => s + w.amount, 0);
+    const pl = F.current[k] + wd - F.base[k];
+    return { investor: capName[k], invested: F.base[k], wallet: F.current[k], withdrawn: wd, pl, pl_pct: pl / F.base[k], pl_sar: pl * (F.usd_sar || 3.75), ownership: F.current[k] / totalWallet };
+  });
+  const totalInvested = keys.reduce((s, k) => s + F.base[k], 0), totalPl = F.investors.reduce((s, i) => s + i.pl, 0);
+  const S = F.summary = { total_wallet: totalWallet, total_invested: totalInvested, total_pl: totalPl, roi: totalPl / totalInvested, trades: F.trades.length, as_of: F.as_of };
   const nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const sign = v => v > 0 ? '+' : v < 0 ? '-' : '';
   const money = v => (v < 0 ? '-' : '') + '$' + nf.format(Math.abs(v));
@@ -189,7 +199,7 @@ footer { color:var(--muted); font-size:.8rem; text-align:center; margin-top:56px
     c.append(el('p', 'name', names[i.investor] || i.investor));
     const w = num(money(i.wallet), 'wallet'); w.style.display = 'block'; c.append(w, el('p', 'cap', 'قيمة المحفظة الحالية'));
     const dl = el('dl', 'rows');
-    [['رأس المال', money(i.invested), ''], ['الربح', sMoney(i.pl), cls(i.pl)], ['بالريال', sar(i.pl_sar), cls(i.pl_sar)], ['نسبة الربح', sPct(i.pl_pct), cls(i.pl_pct)], ['حصته من الصندوق', pct2(i.ownership), '']]
+    [['مبلغ الدخول الأساسي', money(i.invested), ''], ...(i.withdrawn ? [['المسحوب', money(i.withdrawn), '']] : []), ['الربح', sMoney(i.pl), cls(i.pl)], ['بالريال', sar(i.pl_sar), cls(i.pl_sar)], ['نسبة الربح', sPct(i.pl_pct), cls(i.pl_pct)], ['حصته من الصندوق', pct2(i.ownership), '']]
       .forEach(([t, v, k]) => { const r = el('div'); r.append(el('dt', '', t)); const dd = el('dd'); dd.append(num(v, k)); r.append(dd); dl.append(r); });
     const bar = el('div', 'bar'), fill = el('i'); fill.style.width = Math.min(100, i.ownership * 100) + '%'; bar.append(fill);
     c.append(dl, bar); $('inv').append(c);
